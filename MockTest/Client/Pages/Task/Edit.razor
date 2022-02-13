@@ -1,0 +1,23 @@
+﻿@page "/tests/edit/{id:int}"
+@inject HttpClient _client
+@inject NavigationManager _navManager  
+
+<h3><b><u>Edit Test Profile</u></b></h3>
+
+<FormComponent ButtonText="Update" OnValidSubmit="EditTest" test="test" />
+
+@code {
+    [Parameter] public int id { get; set; }
+    Test test = new Test();
+
+    protected async override Task OnParametersSetAsync()
+    {
+        test = await _client.GetFromJsonAsync<Test>($"{Endpoints.TestsEndpoint}/{id}");
+    }
+
+    async Task EditTest()
+    {
+        await _client.PutAsJsonAsync($"{Endpoints.TestsEndpoint}/{id}", test);
+        _navManager.NavigateTo("/tests/");
+    }
+}

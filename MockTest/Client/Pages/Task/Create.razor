@@ -1,0 +1,19 @@
+﻿@page "/tests/create/"
+@inject HttpClient _client
+@inject NavigationManager _navManager
+
+<h3 class="card-title"><b><u>Create New Test</u></b></h3>
+<hr />
+<br />
+
+<FormComponent ButtonText="Create Test" test="test" OnValidSubmit="@CreateTest" />
+
+@code {
+    Test test= new Test();
+
+    private async Task CreateTest()
+    {
+        await _client.PostAsJsonAsync(Endpoints.TestsEndpoint, test);
+        _navManager.NavigateTo("/tests/");
+    }
+}

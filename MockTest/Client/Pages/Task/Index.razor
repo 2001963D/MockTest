@@ -1,0 +1,100 @@
+﻿@page "/tests/"
+@inject HttpClient _client
+@inject IJSRuntime js
+@attribute [Authorize]
+@inject HttpInterceptorService _interceptor
+@implements IDisposable
+
+<h3 class="card-title"><b><u>Test</u></b></h3>
+<br />
+<a href="/tests/create/" class="btn btn-secondary">
+    <span class="oi oi-plus"></span>
+    Write A Test
+</a>
+<br />
+<br />
+
+@if (Tests == null)
+{
+    <div class="alert alert-info">Loading Tasks...</div>
+}
+else
+{
+    <table class="table table-responsive">
+        <thead>
+            <tr>
+                <th>TaskName</th>
+                <th>Completion</th>
+                <th>Due Date</th>
+                <th>Created On</th>
+                <th>Created By</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var test in Tests)
+            {
+                <tr>
+
+                    <td>@test.TaskName</td>
+                    <td>@test.IsCompleted</td>
+                    <td>@test.DueDate.Value.ToString("dd MMMM yyyy")</td>
+                    @*@foreach (var testsss in Tests)
+                        {
+                            if (testsss.DueDate < testsss.CreatedDate)
+                            {
+                            <td>(@testsss.DueDate.Value.ToString() = "To be determined")
+                        </td>
+                            } }*@
+                    <td>@test.CreatedDate.ToString("dd MMMM yyyy")</td>
+                    <td>@test.CreatedBy</td>
+
+                    <td>
+
+                        <a href="/tests/view/@test.Id" class="btn btn-primary">
+                            <span class="oi oi-eye"></span>
+                        </a>
+                        <a href="/tests/edit/@test.Id" class="btn btn-warning">
+                            <span class="oi oi-pencil"></span>
+                        </a>
+                        <button class="btn btn-danger" @onclick="@(()=>Delete(test.Id))">
+                            <span class="oi oi-delete"></span>
+                        </button>
+                    </td>
+                </tr>
+            }
+
+        </tbody>
+    </table>
+}
+
+
+
+@code {
+    private List<Test> Tests;
+
+    Test test = new Test();
+    protected async override Task OnInitializedAsync()
+    {
+        _interceptor.MonitorEvent();
+        Tests = await _client.GetFromJsonAsync<List<Test>>($"{Endpoints.TestsEndpoint}");
+    }
+    private DateTime nullDT = new DateTime(1, 1, 1, 0, 0, 0);
+
+    async Task Delete(int testId)
+    {
+        var test = Tests.First(q => q.Id == testId);
+        var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {test.TaskName}?");
+        if (confirm)
+        {
+            await _client.DeleteAsync($"{Endpoints.TestsEndpoint}/{testId}");
+            await OnInitializedAsync();
+        }
+    }
+    public void Dispose()
+    {
+        _interceptor.DisposeEvent();
+    }
+
+}
