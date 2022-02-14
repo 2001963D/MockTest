@@ -13,7 +13,8 @@
 
     private async Task CreateTest()
     {
-        await _client.PostAsJsonAsync(Endpoints.TestsEndpoint, test);
+        await _client.PostAsJsonAsync("api/tests", test);
+        //await _client.PostAsJsonAsync(Endpoints.TestsEndpoint, test);
         _navManager.NavigateTo("/tests/");
     }
 }

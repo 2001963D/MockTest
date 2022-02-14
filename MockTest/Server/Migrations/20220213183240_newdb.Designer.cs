@@ -10,7 +10,7 @@ using MockTest.Server.Data;
 namespace MockTest.Server.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20220213110900_newdb")]
+    [Migration("20220213183240_newdb")]
     partial class newdb
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -277,12 +277,6 @@ namespace MockTest.Server.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("bit");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("bit");

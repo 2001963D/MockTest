@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.ApiAuthorization.IdentityServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MockTest.Server.Configurations.Entities;
+
 using MockTest.Server.Models;
 using MockTest.Shared.Domain;
 using System;
@@ -25,9 +25,7 @@ namespace MockTest.Server.Data
         {
             base.OnModelCreating(builder);
 
-            builder.ApplyConfiguration(new RoleSeedConfiguration());
-            builder.ApplyConfiguration(new UserSeedConfiguration());
-            builder.ApplyConfiguration(new UserRoleSeedConfiguration());
+
         }
     }
 }

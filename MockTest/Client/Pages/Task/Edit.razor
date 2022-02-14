@@ -10,14 +10,22 @@
     [Parameter] public int id { get; set; }
     Test test = new Test();
 
+    //protected async override Task OnParametersSetAsync()
+    //{
+
+    //    test = await _client.GetFromJsonAsync<Test>($"{Endpoints.TestsEndpoint}/{id}");
+    //}
     protected async override Task OnParametersSetAsync()
     {
-        test = await _client.GetFromJsonAsync<Test>($"{Endpoints.TestsEndpoint}/{id}");
+        //test = await _client.GetFromJsonAsync<Test>($"{Endpoints.TestsEndpoint}/{id}");
+        test = await _client.GetFromJsonAsync<Test>("api/tests/" + id);
     }
 
     async Task EditTest()
     {
-        await _client.PutAsJsonAsync($"{Endpoints.TestsEndpoint}/{id}", test);
+        await _client.PutAsJsonAsync("api/test/" + id, test);
         _navManager.NavigateTo("/tests/");
+        //await _client.PutAsJsonAsync($"{Endpoints.TestsEndpoint}/{id}", test);
+        //_navManager.NavigateTo("/tests/");
     }
 }

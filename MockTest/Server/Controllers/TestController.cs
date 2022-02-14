@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MockTest.Server.Data;
 using MockTest.Shared.Domain;
-using MockTest.Server.IRepository;
+
+using System.Security.Claims;
+using Microsoft.AspNetCore.Identity;
+using MockTest.Server.Models;
 
 namespace MockTest.Server.Controllers
 {
@@ -16,36 +19,41 @@ namespace MockTest.Server.Controllers
     public class TestsController : ControllerBase
     {
         //Refactored
-        //private readonly ApplicationDbContext _context;
-        private readonly IUnitOfWork _unitofWork;
 
+        private readonly ApplicationDbContext _context;
+        private UserManager<ApplicationUser> _userManager;
 
-        public TestsController(IUnitOfWork unitofWork)
+        public TestsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
-            //Refactored
-            //_context = context;
-            _unitofWork = unitofWork;
+            _context = context;
+            _userManager = userManager;
         }
+        //public TestsController(IUnitOfWork unitofWork)
+        //{
+        //    //Refactored
+        //    //_context = context;
+        //    _unitofWork = unitofWork;
+        //}
 
         // GET: api/Tests
         [HttpGet]
 
-        public async Task<IActionResult> GetTests()
+        public async Task<ActionResult<IEnumerable<Test>>> GetTests()
         {
-           //return NotFound();
+            //return NotFound();
+            return await _context.Tests.ToListAsync();
+            //var Tests = await _unitofWork.Tests.GetAll();
 
-            var Tests = await _unitofWork.Tests.GetAll();
-
-            return Ok(Tests);
+            //return Ok(Tests);
         }
 
 
         [HttpGet("{id}")]
 
-        public async Task<IActionResult> GetTest(int id)
+        public async Task<ActionResult<Test>> GetTest(int id)
         {
 
-            var Test = await _unitofWork.Tests.Get(q => q.Id == id);
+            var Test = await _context.Tests.FindAsync(id);
 
             if (Test == null)
             {
@@ -54,6 +62,18 @@ namespace MockTest.Server.Controllers
 
             return Ok(Test);
         }
+        //public async Task<IActionResult> GetTest(int id)
+        //{
+
+        //    var Test = await _unitofWork.Tests.Get(q => q.Id == id);
+
+        //    if (Test == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    return Ok(Test);
+        //}
 
 
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
@@ -65,18 +85,18 @@ namespace MockTest.Server.Controllers
                 return BadRequest();
             }
 
-            //_context.Entry(Test).State = EntityState.Modified;
-            _unitofWork.Tests.Update(Test);
+            _context.Entry(Test).State = EntityState.Modified;
+            //_unitofWork.Tests.Update(Test);
 
             try
             {
-                //await _context.SaveChangesAsync();
-                await _unitofWork.Save(HttpContext);
+                await _context.SaveChangesAsync();
+                //await _unitofWork.Save(HttpContext);
             }
             catch (DbUpdateConcurrencyException)
             {
 
-                if (!await TestExists(id))
+                if (!TestExists(id))
                 {
                     return NotFound();
                 }
@@ -94,10 +114,18 @@ namespace MockTest.Server.Controllers
         [HttpPost]
         public async Task<ActionResult<Test>> PostTest(Test Test)
         {
-            // _context.Test.Add(Test);
-            // await _context.SaveChangesAsync();
-            await _unitofWork.Tests.Insert(Test);
-            await _unitofWork.Save(HttpContext);
+            var userId = HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var user = await _userManager.FindByIdAsync(userId);
+
+
+            Test.CreatedDate = DateTime.Now;
+            Test.CreatedBy = user.Email;
+             _context.Tests.Add(Test);
+             await _context.SaveChangesAsync();
+
+            //await _unitofWork.Tests.Insert(Test);
+            //await _unitofWork.Save(HttpContext);
+
 
             return CreatedAtAction("GetTest", new { id = Test.Id }, Test);
         }
@@ -106,26 +134,26 @@ namespace MockTest.Server.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTest(int id)
         {
-            //var Test = await _context.Employers.FindAsync(id);
-            var Test = await _unitofWork.Tests.Get(q => q.Id == id);
+            var Test = await _context.Tests.FindAsync(id);
+            //var Test = await _unitofWork.Tests.Get(q => q.Id == id);
             if (Test == null)
             {
                 return NotFound();
             }
 
-
-            // await _context.SaveChangesAsync();
-            await _unitofWork.Tests.Delete(id);
-            await _unitofWork.Save(HttpContext);
+            _context.Tests.Remove(Test);
+             await _context.SaveChangesAsync();
+            //await _unitofWork.Tests.Delete(id);
+            //await _unitofWork.Save(HttpContext);
 
             return NoContent();
         }
-
-        private async Task<bool> TestExists(int id)
+        //private async Task<bool> TestExists(int id)
+        private bool TestExists(int id)
         {
-
-            var Test = await _unitofWork.Tests.Get(q => q.Id == id);
-            return Test != null;
+            return _context.Tests.Any(q => q.Id == id);
+            //var Test = await _unitofWork.Tests.Get(q => q.Id == id);
+            //return Test != null;
         }
     }
 }

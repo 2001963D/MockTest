@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using MockTest.Client.Services;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -19,7 +18,7 @@ namespace MockTest.Client
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("#app");
-
+            
 
             builder.Services.AddHttpClient("MockTest.ServerAPI", (sp,
             client) => {
@@ -34,7 +33,7 @@ namespace MockTest.Client
 
             builder.Services.AddHttpClientInterceptor();
 
-            builder.Services.AddScoped<HttpInterceptorService>();   
+  
 
             builder.Services.AddApiAuthorization();
 

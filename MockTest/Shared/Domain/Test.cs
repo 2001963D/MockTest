@@ -15,6 +15,7 @@ namespace MockTest.Shared.Domain
         [StringLength(100, MinimumLength = 2, ErrorMessage = "Task Name does not meet length requirements")]
         public string TaskName { get; set; }
         [Required]
+        [DataType(DataType.Date)]
         public DateTime? DueDate { get; set; }
         public Boolean IsCompleted { get; set; }
 

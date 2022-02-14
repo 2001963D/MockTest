@@ -2,14 +2,15 @@
 @inject HttpClient _client
 @inject IJSRuntime js
 @attribute [Authorize]
-@inject HttpInterceptorService _interceptor
-@implements IDisposable
 
+
+
+ 
 <h3 class="card-title"><b><u>Test</u></b></h3>
 <br />
 <a href="/tests/create/" class="btn btn-secondary">
     <span class="oi oi-plus"></span>
-    Write A Test
+    Create A Test
 </a>
 <br />
 <br />
@@ -26,8 +27,8 @@ else
                 <th>TaskName</th>
                 <th>Completion</th>
                 <th>Due Date</th>
-                <th>Created On</th>
-                <th>Created By</th>
+                @*<th>Created On</th>
+                <th>Created By</th>*@
                 <th>Actions</th>
             </tr>
         </thead>
@@ -47,8 +48,8 @@ else
                             <td>(@testsss.DueDate.Value.ToString() = "To be determined")
                         </td>
                             } }*@
-                    <td>@test.CreatedDate.ToString("dd MMMM yyyy")</td>
-                    <td>@test.CreatedBy</td>
+                    @*<td>@test.CreatedDate.ToString("dd MMMM yyyy")</td>
+                    <td>@test.CreatedBy</td>*@
 
                     <td>
 
@@ -77,8 +78,9 @@ else
     Test test = new Test();
     protected async override Task OnInitializedAsync()
     {
-        _interceptor.MonitorEvent();
-        Tests = await _client.GetFromJsonAsync<List<Test>>($"{Endpoints.TestsEndpoint}");
+
+        //Tests = await _client.GetFromJsonAsync<List<Test>>($"{Endpoints.TestsEndpoint}");
+        Tests = await _client.GetFromJsonAsync<List<Test>>("api/tests");
     }
     private DateTime nullDT = new DateTime(1, 1, 1, 0, 0, 0);
 
@@ -88,13 +90,10 @@ else
         var confirm = await js.InvokeAsync<bool>("confirm", $"Do you want to delete {test.TaskName}?");
         if (confirm)
         {
-            await _client.DeleteAsync($"{Endpoints.TestsEndpoint}/{testId}");
+            await _client.DeleteAsync($"api/tests/{testId}");
             await OnInitializedAsync();
         }
     }
-    public void Dispose()
-    {
-        _interceptor.DisposeEvent();
-    }
+
 
 }

@@ -13,13 +13,17 @@ namespace MockTest.Server.Controllers
     {
         private readonly ApplicationDbContext _context;
         UserManager<ApplicationUser> _userManager;
-        public AccountsController(ApplicationDbContext context,
-        
-        UserManager<ApplicationUser> userManager)
+        public AccountsController(ApplicationDbContext context)
         {
             _context = context;
-            _userManager = userManager;
         }
+        //public AccountsController(ApplicationDbContext context,
+        
+        //UserManager<ApplicationUser> userManager)
+        //{
+        //    _context = context;
+        //    _userManager = userManager;
+        //}
         /// <summary>
         /// Retrieve all the users
         /// </summary>
@@ -27,14 +31,16 @@ namespace MockTest.Server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAccounts()
         {
-            var appUserList = await _context.ApplicationUsers.ToListAsync();
-            List<ClientApplicationUser> clientAppUserList = new List<ClientApplicationUser>();
-            foreach (var appUser in appUserList)
-            {
-                ClientApplicationUser clientAppUser = new ClientApplicationUser(appUser);
-                clientAppUserList.Add(clientAppUser);
-            }
-            return Ok(clientAppUserList);
+            var usersList = await _context.ApplicationUsers.ToListAsync();
+            return Ok(usersList);
+            //var appUserList = await _context.ApplicationUsers.ToListAsync();
+            //List<ClientApplicationUser> clientAppUserList = new List<ClientApplicationUser>();
+            //foreach (var appUser in appUserList)
+            //{
+            //    ClientApplicationUser clientAppUser = new ClientApplicationUser(appUser);
+            //    clientAppUserList.Add(clientAppUser);
+            //}
+            //return Ok(clientAppUserList);
         }
         /// <summary>
         /// Retrieve the role information based on user id
